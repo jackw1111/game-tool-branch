@@ -1,0 +1,1 @@
+alert('lerp result: ' + Module.lerp(1, 4, 0.5))
