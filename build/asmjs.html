@@ -41,7 +41,7 @@
 
     <div class="spinner" id='spinner'></div>
     <div class="emscripten" id="status">Downloading...</div>
-    
+    <div id="log"></div>
 
     <!-- Allow the C++ to access the canvas element --> 
     <script type='text/javascript'>
@@ -104,9 +104,23 @@
         printErr: function(text) {
           if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
           console.error(text);
+          console.log(text);
         },
 
+
         };
+        (function () {
+            var old = console.log;
+            var logger = document.getElementById('log');
+            console.log = function (message) {
+                if (typeof message == 'object') {
+                    logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+                } else {
+                    logger.innerHTML += message + '<br />';
+                }
+            }
+        })();
+        
         window.onload = function() {
           saveAndLoad("textarea", allText);
 
