@@ -351,8 +351,6 @@ int Application::_setup(std::string title, unsigned int WIDTH, unsigned int HEIG
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
-    //ourModel.setup("data/astroboy.obj");
-
     return 0;
 }
 
@@ -373,10 +371,8 @@ void Application::gameLoop() {
 
     // render
     // ------
-    //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //ourModel.Draw();
 
     draw();
     // glBindVertexArray(0); // no need to unbind it every time 

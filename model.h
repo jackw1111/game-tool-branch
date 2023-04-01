@@ -55,8 +55,10 @@ public:
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -2.0f, -5.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1,1,1)); // it's a bit too big for our scene, so scale it down
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1,0,0)); // it's a bit too big for our scene, so scale it down
+
+        //model = glm::translate(model, glm::vec3(0.0f, -2.0f, -5.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f)); // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
 
         // view/projection transformations

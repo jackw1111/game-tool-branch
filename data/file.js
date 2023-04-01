@@ -10,7 +10,7 @@ var DerivedClass = Module.Application.extend("Application", {
 	setup: function() {
     	console.log("setting up");
     	this.model = new Module.Model;
-    	this.model.setup("data/astroboy.obj", false);
+    	this.model.setup("data/astroboy.dae", false);
     },
     __destruct: function() {
         this.__parent.__destruct.call(this);
