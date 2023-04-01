@@ -7,16 +7,24 @@ var DerivedClass = Module.Application.extend("Application", {
         this.__parent.__construct.call(this);
         this.setup();
     },
-	setup: function() {
-    	console.log("setting up");
-    	this.model = new Module.Model;
-    	this.model.setup("data/astroboy.dae", false);
+    setup() {
+        console.log("setting up");
+        this.model = new Module.Model;
+        this.model.setup("heli.obj", false);
+        this.angle = 0.0;
+    },
+
+    draw() {
+        this.angle = this.angle + 0.01;
+        this.up = new Module.vec3(0.0, 1.0, 0.0);
+        this.scalar = new Module.vec3(0.1, 0.1, 0.1);
+        this.model.model = new Module.mat4(1.0);
+        this.model.model = Module.rotate(this.model.model, this.angle, this.up);
+        this.model.model = Module.scale(this.model.model, this.scalar);
+        this.model.draw();
     },
     __destruct: function() {
         this.__parent.__destruct.call(this);
-    },
-    draw: function() {
-    	this.model.draw();
     },
 });
 

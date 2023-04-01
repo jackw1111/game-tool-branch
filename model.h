@@ -36,6 +36,7 @@ public:
     string directory;
     bool gammaCorrection;
     Shader ourShader;
+    glm::mat4 model;
 
     Model(){};
 
@@ -44,21 +45,18 @@ public:
     {
         loadModel(path);
         ourShader.setup("data/shader.vs", "data/shader.fs");
+        model = glm::mat4(1.0f);
     }
 
     // draws the model, and thus all its meshes
     void Draw()
     {
+        // render the loaded model
+
         ourShader.use();
         glBindAttribLocation(ourShader.ID, 0, "aPos");
         glBindAttribLocation(ourShader.ID, 1, "aTexCoord");
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1,0,0)); // it's a bit too big for our scene, so scale it down
-
-        //model = glm::translate(model, glm::vec3(0.0f, -2.0f, -5.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f)); // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
 
         // view/projection transformations

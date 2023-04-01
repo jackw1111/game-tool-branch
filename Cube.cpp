@@ -17,10 +17,11 @@ using namespace emscripten;
 #include "stb_image.h"
 #endif
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-
+#include "glm/gtx/string_cast.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -46,6 +47,20 @@ using namespace emscripten;
 
 #include "camera.h"
 #include "model.h"
+
+#include <fstream>
+
+std::string processFile(std::string filename)
+{
+    std::fstream fs;
+    fs.open (filename, std::fstream::in | std::fstream::binary);
+    if (fs) {
+        fs.close();
+        return "File '" + filename + "' exists!";
+    } else {
+        return "File '" + filename + "' does NOT exist!";
+    }
+}
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
@@ -402,6 +417,37 @@ void setViewport(int x1, int y1, int x2, int y2) {
     glViewport(x1, y1, x2, y2);   
 }
 
+struct custom_deleter_mat4 {
+   glm::mat4 operator()(glm::mat4* m);
+};
+
+glm::mat4 custom_deleter_mat4::operator()(glm::mat4* f) {
+  return *f;
+}
+
+// glm::mat4* _rotate (glm::mat4 const &m, const float &rot, glm::vec3 const &v)
+// {
+//     glm::mat4 *tmp = new glm::mat4();
+//     *tmp = glm::rotate(m, rot, v);
+//     std::unique_ptr<glm::mat4, custom_deleter_mat4> _m( tmp );
+//     return _m.get();
+// }
+
+glm::mat4 _rotate (glm::mat4 const &m, const float &rot, glm::vec3 const &v)
+{
+    return glm::rotate(m, rot, v);
+}
+
+glm::mat4 _scale(glm::mat4 const &m, glm::vec3 const &v)
+{
+    return glm::scale(m, v);
+}
+glm::mat4 _translate(glm::mat4 const &m, glm::vec3 const &v)
+{
+    return glm::translate(m, v);
+}
+
+
 struct ApplicationWrapper : public wrapper<Application> {
     EMSCRIPTEN_WRAPPER(ApplicationWrapper);
     void setup() {
@@ -420,11 +466,13 @@ Application* run(Application* a) {
     return a;
 }
 
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("lerp", &lerp);
     emscripten::function("clearColor", &clearColor);
     emscripten::function("setViewport", &setViewport);
-
+    emscripten::function("processFile", &processFile);
+    
     class_<Cube>("Cube")
     .constructor<>()
     .function("setup", &Cube::setup)
@@ -435,7 +483,18 @@ EMSCRIPTEN_BINDINGS(my_module) {
     .constructor<>()
     .function("setup", &Model::setup)
     .function("draw", &Model::Draw)
+    .property("model", &Model::model)
     ;
+
+    class_<glm::mat4>("mat4")
+    .constructor<float>();
+    emscripten::function("rotate", &_rotate);
+    emscripten::function("scale", &_scale);
+    emscripten::function("translate", &_translate);
+
+
+    class_ <glm::vec3>("vec3")
+    .constructor<float, float, float>();
 
     class_<Application>("Application")
     .function("setup", &Application::setup, pure_virtual())
