@@ -1,4 +1,0 @@
-function randomNumber(min, max) {
-  return Math.random() * (max - min) + min;
-}
-Module.clearColor(randomNumber(0,255)/255.0, randomNumber(0,255)/255.0, randomNumber(0,255)/255.0);

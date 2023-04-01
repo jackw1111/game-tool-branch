@@ -9,17 +9,14 @@ var DerivedClass = Module.Application.extend("Application", {
     },
 	setup: function() {
     	console.log("setting up");
-    	this.cube = new Module.Cube;
-    	this.cube.setup();
-        // your code goes here
+    	this.model = new Module.Model;
+    	this.model.setup("data/astroboy.obj", false);
     },
     __destruct: function() {
         this.__parent.__destruct.call(this);
     },
     draw: function() {
-    	console.log("hello world!");
-    	this.cube.draw();
-        // your code goes here
+    	this.model.draw();
     },
 });
 

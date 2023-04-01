@@ -52,7 +52,7 @@
 
         var Module = {
             onRuntimeInitialized: function() {
-              console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
+
             },
             canvas: (function() { return document.getElementById('canvas'); })(),
             print: (function() {
@@ -120,13 +120,15 @@
         };
 
           Module.setStatus('Downloading...');
-          window.onerror = function(event) {
+
+          window.onerror = function(message, source, line, col, error) {
             // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
-            Module.setStatus('Exception thrown, see JavaScript console');
+            Module.setStatus(message);
             spinnerElement.style.display = 'none';
             Module.setStatus = function(text) {
               if (text) Module.printErr('[post-exception status] ' + text);
             };
+            return true;
           };
 
     </script>
@@ -149,6 +151,7 @@
         }
         rawFile.send(null);
 
+        console.log("couldn't load text file!");
         return "";
     }
 

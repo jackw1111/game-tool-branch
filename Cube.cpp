@@ -7,7 +7,9 @@ using namespace emscripten;
 #define GL_GLEXT_PROTOTYPES
 #define EGL_EGLEXT_PROTOTYPES
 #include "stb_image.h"
-
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 #else
 #include <glad/glad.h>
 
@@ -42,13 +44,17 @@ using namespace emscripten;
 #include <chrono>
 
 
-#include "shader.h"
+#include "camera.h"
+#include "model.h"
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 // camera
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -183,11 +189,11 @@ public:
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
-    data = stbi_load("data/awesomeface.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("data/container.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
         // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -249,6 +255,8 @@ public:
   std::string name = "Application";
 
   GLFWwindow* window;
+
+  //Model ourModel;
 
 public:
 
@@ -343,6 +351,7 @@ int Application::_setup(std::string title, unsigned int WIDTH, unsigned int HEIG
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    //ourModel.setup("data/astroboy.obj");
 
     return 0;
 }
@@ -366,6 +375,8 @@ void Application::gameLoop() {
     // ------
     //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    //ourModel.Draw();
 
     draw();
     // glBindVertexArray(0); // no need to unbind it every time 
@@ -414,14 +425,20 @@ Application* run(Application* a) {
 }
 
 EMSCRIPTEN_BINDINGS(my_module) {
-    function("lerp", &lerp);
-    function("clearColor", &clearColor);
-    function("setViewport", &setViewport);
+    emscripten::function("lerp", &lerp);
+    emscripten::function("clearColor", &clearColor);
+    emscripten::function("setViewport", &setViewport);
 
     class_<Cube>("Cube")
     .constructor<>()
     .function("setup", &Cube::setup)
     .function("draw", &Cube::draw)
+    ;
+
+    class_<Model>("Model")
+    .constructor<>()
+    .function("setup", &Model::setup)
+    .function("draw", &Model::Draw)
     ;
 
     class_<Application>("Application")
@@ -430,7 +447,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     .allow_subclass<ApplicationWrapper>("ApplicationWrapper")
     ;
 
-    function("run", &run, allow_raw_pointers());
+    emscripten::function("run", &run, allow_raw_pointers());
 }
 
 #endif
@@ -504,3 +521,4 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
+
