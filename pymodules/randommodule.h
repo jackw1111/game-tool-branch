@@ -1,0 +1,1 @@
+PyMODINIT_FUNC init_random(void);
